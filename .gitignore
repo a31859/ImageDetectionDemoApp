@@ -1,0 +1,11 @@
+# Mac
+.DS_Store
+
+# iOS
+platforms/ios
+
+# android
+platforms/android
+
+# res
+resources/signing
