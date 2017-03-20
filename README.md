@@ -1,4 +1,11 @@
-# Running
+# Image Detection Cordova Plugin Demo
+
+This is a demo App that already includes the plugin.
+
+You can find the plugin [here](https://github.com/Cloudoki/ImageDetectionCordovaPlugin).
+
+
+## Running
 Add the desired platform and run it.
 
 Before running the commands bellow go into `plugins/com.cloudoki.imagedetectionplugin/src/ios/` and extract the `opencv2.framework.zip` since it's too big for Github.
