@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    id="com.cloudoki.imagedetectionplugin"
+    version="0.0.2">
+    <name>Image Detection Plugin</name>
+
+    <description>The ImageDetectionPlugin for Cordova enables the use of OpenCV SDK to detect an inputed image.</description>
+
+    <author>Délio Amaral</author>
+
+    <keywords>OpenCV, image detection, image matching</keywords>
+
+    <repo>https://github.com/Cloudoki/ImageDetectionCordovaPlugin</repo>
+
+    <license>See License.md for details of the license</license>
+
+    <engines>
+      <engine name="cordova" version=">=3.4.0" />
+    </engines>
+
+    <asset src="www/ImageDetectionPlugin.js" target="js/ImageDetectionPlugin.js"/>
+
+    <js-module src="www/ImageDetectionPlugin.js" name="ImageDetectionPlugin">
+        <clobbers target="ImageDetectionPlugin" />
+    </js-module>
+
+    <!-- Android -->
+    <platform name="android">
+      <config-file target="res/xml/config.xml" parent="/*">
+         <feature name="ImageDetectionPlugin">
+           <param name="android-package" value="com.cloudoki.imagedetectionplugin.ImageDetectionPlugin"/>
+           <param name="onload" value="true" />
+         </feature>
+      </config-file>
+      <config-file parent="/manifest" target="AndroidManifest.xml">
+        <uses-sdk android:minSdkVersion="16" android:targetSdkVersion="23" />
+        <uses-permission android:name="android.permission.CAMERA" />
+        <uses-permission android:name="android.permission.INTERNET" />
+        <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+        <uses-permission android:name="android.permission.VIBRATE" />
+        <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+        <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+        <uses-feature android:name="android.hardware.camera.any" />
+        <uses-feature android:name="android.hardware.camera" android:required="true" />
+        <uses-feature android:name="android.hardware.camera.autofocus" android:required="true" />
+        <supports-screens
+            android:smallScreens="true"
+            android:normalScreens="true"
+            android:largeScreens="true"
+            android:xlargeScreens="true"
+            android:anyDensity="true" />
+      </config-file>
+
+      <framework src="com.android.support:support-v4:+" />
+      <framework src="com.android.support:appcompat-v7:+" />
+      <source-file src="src/android/libs/build-extras.gradle" target-dir="." />
+      <source-file src="src/android/libs/opencv-release.aar" target-dir="libs/" />
+      <source-file src="src/android/ImageDetectionPlugin.java" target-dir="src/com/cloudoki/imagedetectionplugin/" />
+    </platform>
+
+    <!-- iOS -->
+    <platform name="ios">
+      <config-file target="config.xml" parent="/*">
+        <feature name="ImageDetectionPlugin">
+          <param name="ios-package" value="ImageDetectionPlugin" />
+          <param name="onload" value="true" />
+        </feature>
+      </config-file>
+
+      <header-file src="src/ios/ImageDetectionPlugin.h" target-dir="ImageDetectionPlugin" />
+      <source-file src="src/ios/ImageDetectionPlugin.mm" target-dir="ImageDetectionPlugin" />
+      <header-file src="src/ios/ImageUtils.h" targer-dir="." />
+      <source-file src="src/ios/ImageUtils.mm" targer-dir="." />
+      <source-file src="src/ios/libjpeg.a" target-dir="." framework="true" />
+
+      <framework src="Accelerate.framework" />
+      <framework src="AssetsLibrary.framework" />
+      <framework src="AVFoundation.framework" />
+      <framework src="CoreGraphics.framework" />
+      <framework src="CoreImage.framework" />
+      <framework src="CoreMedia.framework" />
+      <framework src="CoreVideo.framework" />
+      <framework src="Foundation.framework" />
+      <framework src="QuartzCore.framework" />
+      <framework src="UIKit.framework" />
+      <framework src="src/ios/opencv2.framework" custom="true" />
+    </platform>
+</plugin>

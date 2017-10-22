@@ -1,0 +1,16 @@
+{
+  "name": "com.demo.imagedetectiondemoapp",
+  "version": "1.0.0",
+  "displayName": "ImageDetectionDemoApp",
+  "cordova": {
+    "platforms": [],
+    "plugins": {
+      "cordova-plugin-whitelist": {},
+      "com.cloudoki.imagedetectionplugin": {}
+    }
+  },
+  "dependencies": {
+    "com.cloudoki.imagedetectionplugin": "file:///Users/dnva/Documents/tests/ImageDetectionCordovaPlugin",
+    "cordova-plugin-whitelist": "1"
+  }
+}

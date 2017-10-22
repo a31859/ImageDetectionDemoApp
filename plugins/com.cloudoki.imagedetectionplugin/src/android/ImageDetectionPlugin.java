@@ -106,6 +106,9 @@ public class ImageDetectionPlugin extends CordovaPlugin implements SurfaceHolder
             Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
 
+    private String coords;
+    private int screenWidth = 1, screenHeight = 1;
+
     @SuppressWarnings("deprecation")
     private static class JavaCameraSizeAccessor implements CameraBridgeViewBase.ListItemAccessor {
 
@@ -226,17 +229,19 @@ public class ImageDetectionPlugin extends CordovaPlugin implements SurfaceHolder
             boolean argVal;
             try {
                 argVal = data.getBoolean(0);
+                screenHeight = data.getInt(1);
+                screenWidth = data.getInt(2);
             } catch (JSONException je) {
                 argVal = true;
                 Log.e(TAG, je.getMessage());
             }
             if(argVal) {
                 processFrames = true;
-                message = "Frame processing set to 'true'";
+                message = "Frame processing set to 'true', screen size is h - " + screenHeight + ", w - " + screenWidth;
                 callbackContext.success(message);
             } else {
                 processFrames = false;
-                message = "Frame processing set to 'false'";
+                message = "Frame processing set to 'false', screen size is h - " + screenHeight + ", w - " + screenWidth;
                 callbackContext.error(message);
             }
             return true;
@@ -784,17 +789,52 @@ public class ImageDetectionPlugin extends CordovaPlugin implements SurfaceHolder
                         if (result) {
                             Log.i("#### DETECTION ####", "Detected stuff");
                             updateState(true, index);
+                            Mat obj_corners = new Mat(4, 1, CvType.CV_32FC2);
+                            Mat scene_corners = new Mat(4, 1, CvType.CV_32FC2);
+
+                            obj_corners.put(0, 0, 0, 0);
+                            obj_corners.put(1, 0, pattern.cols(), 0);
+                            obj_corners.put(2, 0, pattern.cols(), pattern.rows());
+                            obj_corners.put(3, 0, 0, pattern.rows());
+
+                            Core.perspectiveTransform(obj_corners, scene_corners, H);
+
+                            // get mat size to match the detected coordinates with the screen size
+                            double width = (double)(gray.cols());
+                            double height = (double)(gray.rows());
+                            double scaleX = screenWidth/width;
+                            double scaleY = screenHeight/height;
+
+                            double coord1X = scene_corners.get(0, 0)[0] * scaleX;
+                            double coord1Y = scene_corners.get(0, 0)[1] * scaleY;
+                            double coord2X = scene_corners.get(1, 0)[0] * scaleX;
+                            double coord2Y = scene_corners.get(1, 0)[1] * scaleY;
+                            double coord3X = scene_corners.get(2, 0)[0] * scaleX;
+                            double coord3Y = scene_corners.get(2, 0)[1] * scaleY;
+                            double coord4X = scene_corners.get(3, 0)[0] * scaleX;
+                            double coord4Y = scene_corners.get(3, 0)[1] * scaleY;
+
+                            // find center of rect based on triangles centroids mean
+                            double centroidTriang1X = (coord1X + coord2X + coord3X)/3;
+                            double centroidTriang1Y = (coord1Y + coord2Y + coord3Y)/3;
+
+                            double centroidTriang2X = (coord3X + coord4X + coord1X)/3;
+                            double centroidTriang2Y = (coord3Y + coord4Y + coord1Y)/3;
+
+                            double centerx = (centroidTriang1X + centroidTriang2X)/2;
+                            double centery = (centroidTriang1Y + centroidTriang2Y)/2;
+
+                            coords = "\"coords\": {" +
+                                    "\"1\": {\"x\": " + coord1X + ", \"y\": " + coord1Y + "}, " +
+                                    "\"2\": {\"x\": " + coord2X + ", \"y\": " + coord2Y + "}, " +
+                                    "\"3\": {\"x\": " + coord3X + ", \"y\": " + coord3Y + "}, " +
+                                    "\"4\": {\"x\": " + coord4X + ", \"y\": " + coord4Y + "}}, " +
+                                    "\"center\": {\"x\": " + centerx + ", \"y\": " + centery + "}, " +
+                                    "\"scale\": {\"scaleX\": " + scaleX + ", \"scaleY\": " + scaleY + "}, " +
+                                    "\"screen\": {\"screenWidth\": " + screenWidth + ", \"screenHeight\": " + screenHeight + "}, " +
+                                    "\"size\": {\"width\": " + width + ", \"height\": " + height + "}";
+
                             if (debug) {
-                                Mat obj_corners = new Mat(4, 1, CvType.CV_32FC2);
-                                Mat scene_corners = new Mat(4, 1, CvType.CV_32FC2);
-
-                                obj_corners.put(0, 0, 0, 0);
-                                obj_corners.put(1, 0, pattern.cols(), 0);
-                                obj_corners.put(2, 0, pattern.cols(), pattern.rows());
-                                obj_corners.put(3, 0, 0, pattern.rows());
-
-                                Core.perspectiveTransform(obj_corners, scene_corners, H);
-
                                 Imgproc.line(img_matches, new Point(scene_corners.get(0, 0)), new Point(scene_corners.get(1, 0)), new Scalar(0, 255, 0), 4);
                                 Imgproc.line(img_matches, new Point(scene_corners.get(1, 0)), new Point(scene_corners.get(2, 0)), new Scalar(0, 255, 0), 4);
                                 Imgproc.line(img_matches, new Point(scene_corners.get(2, 0)), new Point(scene_corners.get(3, 0)), new Scalar(0, 255, 0), 4);
@@ -896,7 +936,7 @@ public class ImageDetectionPlugin extends CordovaPlugin implements SurfaceHolder
         if (getState(_index) && called_failed_detection && !called_success_detection) {
             cordova.getThreadPool().execute(new Runnable() {
                 public void run() {
-                    PluginResult result = new PluginResult(PluginResult.Status.OK, "{\"message\":\"pattern detected\", \"index\":" + index + "}");
+                    PluginResult result = new PluginResult(PluginResult.Status.OK, "{\"message\":\"pattern detected\", \"index\":" + index + ", " + coords + "}");
                     result.setKeepCallback(true);
                     cb.sendPluginResult(result);
                 }

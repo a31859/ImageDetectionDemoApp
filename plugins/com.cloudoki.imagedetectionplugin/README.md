@@ -21,6 +21,8 @@ cordova plugin add ../ImageDetectionCordovaPlugin
 ### IOS
 - The plugin aims to be used with iOS version >= 7.
 - **Important!** Go into src/ios folder and extract opencv2.framework from the zip file into the same folder.
+- Since iOS 10, `<key>NSCameraUsageDescription</key>` is required in the project Info.plist of any app that wants to use Camera.
+The plugin should add this automatically but in case this does not happen to add it, just open the project in XCode, go to the Info tab and add the `NSCameraUsageDescription` key with a string value that explain why your app need an access to the camera.
 
 ### Note
 In *config.xml* add Android and iOS target preference
@@ -49,10 +51,27 @@ The plugin offers the functions `startProcessing`, `setDetectionTimeout`, `isDet
 startProcessing(true or false, successCallback, errorCallback);
 ```
 
-**`isDetecting`** - the plugin will callback on success function if detecting the pattern or on error function if it's not. The response will also say what index of the patters set is being detected in a JSON object. Just parse it using `JSON.parse()`.
+**`isDetecting`** - the plugin will callback on success function if detecting the pattern or on error function if it's not. The response will also say what index of the patterns is being detected, the detection rect coordinates and the center/centroid in a JSON object. Just parse it using `JSON.parse()`.
 ```javascript
 isDetecting(successCallback, errorCallback);
 ```
+```json
+// JSON RESPONSE EXAMPLE
+{
+  "message": "pattern detected", 
+  "index": 0,
+  "coords": {
+    "1": { "x": 170.839401, "y": 181.510239 }, 
+    "2": { "x": 293.745239, "y": 180.525345 }, 
+    "3": { "x": 301.409363, "y": 352.518280 }, 
+    "4": { "x": 171.494492, "y": 360.808655 }
+  }, 
+  "center": {
+    "x": 234.956223, "y": 268.231842
+  }
+}
+```
+
 **`setDetectionTimeout`** - this function will set a timeout (**in seconds**) in which the processing of the frames will not occur. Calls on success if the argument is set and on error if no value set.
 ```javascript
 setDetectionTimeout(timeout, successCallback, errorCallback);
@@ -72,7 +91,7 @@ imgDetectionPlugin.startProcessing(true, function(success){console.log(success);
 imgDetectionPlugin.isDetecting(function(success){
   console.log(success);
   var resp = JSON.parse(success);
-  console.log(resp.index, "image detected - ", indexes[resp.index]);
+  console.log(resp.index, "image detected - ", indexes[resp.index], resp.coords, resp.center);
 }, function(error){console.log(error);});
 
 function setAllPatterns(patterns) {
@@ -126,3 +145,6 @@ img.src = "img/patterns/target3.jpg";
 
 imgDetectionPlugin.setDetectionTimeout(2, function(success){console.log(success);}, function(error){console.log(error);});
 ```
+
+## Demo Project
+[ImageDetectionDemoApp](https://github.com/a31859/ImageDetectionDemoApp)

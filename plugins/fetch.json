@@ -1,18 +1,18 @@
 {
-    "com.cloudoki.imagedetectionplugin": {
-        "source": {
-            "type": "local",
-            "path": "../ImageDetectionCordovaPlugin"
-        },
-        "is_top_level": true,
-        "variables": {}
+  "cordova-plugin-whitelist": {
+    "source": {
+      "type": "registry",
+      "id": "cordova-plugin-whitelist@1"
     },
-    "cordova-plugin-whitelist": {
-        "source": {
-            "type": "registry",
-            "id": "cordova-plugin-whitelist@1"
-        },
-        "is_top_level": true,
-        "variables": {}
-    }
+    "is_top_level": true,
+    "variables": {}
+  },
+  "com.cloudoki.imagedetectionplugin": {
+    "source": {
+      "type": "local",
+      "path": "/Users/dnva/Documents/tests/ImageDetectionDemoApp/node_modules/com.cloudoki.imagedetectionplugin"
+    },
+    "is_top_level": true,
+    "variables": {}
+  }
 }

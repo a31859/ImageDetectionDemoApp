@@ -12,7 +12,7 @@ using namespace cv;
     bool processFrames, debug, save_files, thread_over, called_success_detection, called_failed_detection;
     int detected_index;
     NSMutableArray *detection;
-    NSString *callbackID;
+    NSString *callbackID, *coords;
     NSDate *last_time, *ease_last_time, *timeout_started;
     float timeout, full_timeout, ease_time;
     NSUInteger triggers_size;
@@ -126,7 +126,7 @@ using namespace cv;
         NSNumber* argVal = [command.arguments objectAtIndex:0];
         NSString* msg;
 
-        if (argVal != nil && argVal > 0) {
+        if (argVal != nil && argVal > (void *) 0) {
             timeout = [argVal floatValue];
             ease_time = 0.5;
             timeout_started = [NSDate date];
@@ -434,16 +434,30 @@ using namespace cv;
                     {
                         UIImageWriteToSavedPhotosAlbum([ImageUtils UIImageFromCVMat:gray], nil, nil, nil);
                     }
+                    
+                    //-- Get the corners from the image_1 ( the object to be "detected" )
+                    std::vector<Point2f> obj_corners(4);
+                    obj_corners[0] = cvPoint(0,0); obj_corners[1] = cvPoint( patt.cols, 0 );
+                    obj_corners[2] = cvPoint( patt.cols, patt.rows ); obj_corners[3] = cvPoint( 0, patt.rows );
+                    std::vector<Point2f> scene_corners(4);
+
+                    perspectiveTransform( obj_corners, scene_corners, H);
+                    
+                    // find center of rect based on triangles centroids mean
+                    float centroidTriang1X = (scene_corners[0].x + scene_corners[1].x + scene_corners[2].x)/3;
+                    float centroidTriang1Y = (scene_corners[0].y + scene_corners[1].y + scene_corners[2].y)/3;
+                    
+                    float centroidTriang2X = (scene_corners[2].x + scene_corners[3].x + scene_corners[0].x)/3;
+                    float centroidTriang2Y = (scene_corners[2].y + scene_corners[3].y + scene_corners[0].y)/3;
+                    
+                    float centerx = (centroidTriang1X + centroidTriang2X)/2;
+                    float centery = (centroidTriang1Y + centroidTriang2Y)/2;
+
+                    coords = [NSString stringWithFormat:@"\"coords\": {\"1\": {\"x\": %f, \"y\": %f}, \"2\": {\"x\": %f, \"y\": %f}, \"3\": {\"x\": %f, \"y\": %f}, \"4\": {\"x\": %f, \"y\": %f}}, \"center\": {\"x\": %f, \"y\": %f}", scene_corners[0].x, scene_corners[0].y, scene_corners[1].x, scene_corners[1].y, scene_corners[2].x, scene_corners[2].y, scene_corners[3].x, scene_corners[3].y, centerx, centery];
+                    
                     if(debug)
                     {
-                        //-- Get the corners from the image_1 ( the object to be "detected" )
-                        std::vector<Point2f> obj_corners(4);
-                        obj_corners[0] = cvPoint(0,0); obj_corners[1] = cvPoint( patt.cols, 0 );
-                        obj_corners[2] = cvPoint( patt.cols, patt.rows ); obj_corners[3] = cvPoint( 0, patt.rows );
-                        std::vector<Point2f> scene_corners(4);
-
-                        perspectiveTransform( obj_corners, scene_corners, H);
-
+                            
                         //-- Draw lines between the corners (the mapped object in the scene - image_2 )
                         line( img_matches, scene_corners[0] + Point2f( patt.cols, 0), scene_corners[1] + Point2f( patt.cols, 0), Scalar(0, 255, 0), 4 );
                         line( img_matches, scene_corners[1] + Point2f( patt.cols, 0), scene_corners[2] + Point2f( patt.cols, 0), Scalar( 0, 255, 0), 4 );
@@ -500,7 +514,7 @@ using namespace cv;
     if([self getState:(int)idx] && called_failed_detection && !called_success_detection) {
         [self.commandDelegate runInBackground:^{
             CDVPluginResult* plugin_result = nil;
-            NSString* msg = [NSString stringWithFormat:@"{\"message\":\"pattern detected\", \"index\":%d}", (int)idx];
+            NSString* msg = [NSString stringWithFormat:@"{\"message\":\"pattern detected\", \"index\":%d, %@}", (int)idx, coords];
             plugin_result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:msg];
             [plugin_result setKeepCallbackAsBool:YES];
 

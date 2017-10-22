@@ -9,3 +9,6 @@ platforms/android
 
 # res
 resources/signing
+
+# Dependency directories
+node_modules

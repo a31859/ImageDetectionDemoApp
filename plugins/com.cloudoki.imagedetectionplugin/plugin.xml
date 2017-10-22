@@ -11,7 +11,7 @@
 
     <keywords>OpenCV, image detection, image matching</keywords>
 
-    <repo>https://github.com/</repo>
+    <repo>https://github.com/Cloudoki/ImageDetectionCordovaPlugin</repo>
 
     <license>See License.md for details of the license</license>
 
@@ -66,6 +66,10 @@
           <param name="ios-package" value="ImageDetectionPlugin" />
           <param name="onload" value="true" />
         </feature>
+      </config-file>
+
+      <config-file target="*-Info.plist" parent="NSCameraUsageDescription">
+          <string>This application needs camera access to perform image detection.</string>
       </config-file>
 
       <header-file src="src/ios/ImageDetectionPlugin.h" target-dir="ImageDetectionPlugin" />

@@ -31,16 +31,54 @@ var app = {
 
         var imgDetectionPlugin = window.plugins.ImageDetectionPlugin || new ImageDetectionPlugin();
 
+
+        var c = document.getElementById("coords");
+        c.width = window.innerWidth;
+        c.height = window.innerHeight;
+
         imgDetectionPlugin.startProcessing(true, function(success){console.log(success);}, function(error){console.log(error);});
 
         imgDetectionPlugin.isDetecting(function(success){
           console.log(success);
           var resp = JSON.parse(success);
+          var coords = resp.coords;
+          var c = document.getElementById("coords");
+          var ctx = c.getContext("2d");
+          ctx.clearRect(0, 0, c.width, c.height);
+          drawRect(coords);
+          drawCoord(coords["1"].x, coords["1"].y, "#FFFF00");
+          drawCoord(coords["2"].x, coords["2"].y, "#FF00FF");
+          drawCoord(coords["3"].x, coords["3"].y, "#FFFFFF");
+          drawCoord(coords["4"].x, coords["4"].y, "#FF0000");
+          drawCoord(resp.center.x, resp.center.y, "green");
           alert("Index detected: " + resp.index + ", Image detected: " + indexes[resp.index]);
         }, function(error){console.log(error);});
 
         function setAllPatterns(patterns) {
           imgDetectionPlugin.setPatterns(patterns, function(success){console.log(success);}, function(error){console.log(error);});
+        }
+
+        function drawRect(coords) {
+          var c = document.getElementById("coords");
+          var ctx = c.getContext("2d");
+          ctx.beginPath();
+          ctx.moveTo(coords["1"].x, coords["1"].y);
+          ctx.lineTo(coords["2"].x, coords["2"].y);
+          ctx.lineTo(coords["3"].x, coords["3"].y);
+          ctx.lineTo(coords["4"].x, coords["4"].y);
+          ctx.lineTo(coords["1"].x, coords["1"].y);
+          ctx.strokeStyle="#FF0000";
+          ctx.stroke();
+        }
+
+        function drawCoord(x, y, color) {
+          var c = document.getElementById("coords");
+          var ctx = c.getContext("2d");
+          ctx.beginPath();
+          ctx.arc(x, y, 10, 0, 2 * Math.PI);
+          ctx.fillStyle = color ? color : 'red';
+          ctx.fill();
+          ctx.stroke();
         }
 
         var loadAllImg = 0;

@@ -1,0 +1,23 @@
+dependencies {
+    compile (name: 'opencv-release', ext: 'aar')
+}
+repositories {
+    flatDir{
+        dirs 'libs'
+    }
+}
+
+ext.postBuildExtras = {
+    android {
+        compileOptions {
+            sourceCompatibility JavaVersion.VERSION_1_7
+            targetCompatibility JavaVersion.VERSION_1_7
+        }
+        allprojects {
+            compileOptions {
+                sourceCompatibility = JavaVersion.VERSION_1_7
+                targetCompatibility = JavaVersion.VERSION_1_7
+            }
+        }
+    }
+}

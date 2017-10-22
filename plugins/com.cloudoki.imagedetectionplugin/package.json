@@ -1,0 +1,81 @@
+{
+  "_args": [
+    [
+      {
+        "raw": "/Users/dnva/Documents/tests/ImageDetectionCordovaPlugin",
+        "scope": null,
+        "escapedName": null,
+        "name": null,
+        "rawSpec": "/Users/dnva/Documents/tests/ImageDetectionCordovaPlugin",
+        "spec": "/Users/dnva/Documents/tests/ImageDetectionCordovaPlugin",
+        "type": "directory"
+      },
+      "/Users/dnva/Documents/tests/ImageDetectionDemoApp"
+    ]
+  ],
+  "_from": "../ImageDetectionCordovaPlugin",
+  "_id": "com.cloudoki.imagedetectionplugin@0.0.2",
+  "_inCache": true,
+  "_location": "/com.cloudoki.imagedetectionplugin",
+  "_phantomChildren": {},
+  "_requested": {
+    "raw": "/Users/dnva/Documents/tests/ImageDetectionCordovaPlugin",
+    "scope": null,
+    "escapedName": null,
+    "name": null,
+    "rawSpec": "/Users/dnva/Documents/tests/ImageDetectionCordovaPlugin",
+    "spec": "/Users/dnva/Documents/tests/ImageDetectionCordovaPlugin",
+    "type": "directory"
+  },
+  "_requiredBy": [
+    "#USER",
+    "/"
+  ],
+  "_resolved": "file:../ImageDetectionCordovaPlugin",
+  "_shasum": "85e71824b953f672f14769038ecd582ff79038e8",
+  "_shrinkwrap": null,
+  "_spec": "/Users/dnva/Documents/tests/ImageDetectionCordovaPlugin",
+  "_where": "/Users/dnva/Documents/tests/ImageDetectionDemoApp",
+  "author": {
+    "name": "Délio Amaral"
+  },
+  "bugs": {
+    "url": "https://github.com/Cloudoki/ImageDetectionCordovaPlugin/issues"
+  },
+  "cordova": {
+    "id": "com.cloudoki.imagedetectionplugin",
+    "platforms": [
+      "android",
+      "ios"
+    ]
+  },
+  "dependencies": {},
+  "description": "The ImageDetectionPlugin for Cordova enables the use of OpenCV SDK to detect an inputed image.",
+  "devDependencies": {},
+  "engines": [
+    {
+      "name": "cordova",
+      "version": ">=3.4.0"
+    }
+  ],
+  "gitHead": "fffd2ce9fdb8ee240fefd1e90c97dcaac9debb26",
+  "homepage": "https://github.com/Cloudoki/ImageDetectionCordovaPlugin#readme",
+  "keywords": [
+    "OpenCV",
+    "image detection",
+    "image matching",
+    "ecosystem:cordova",
+    "cordova-android",
+    "cordova-ios"
+  ],
+  "license": "See License.md for details of the license",
+  "name": "com.cloudoki.imagedetectionplugin",
+  "optionalDependencies": {},
+  "readme": "# Image Detection Plugin (Android & iOS)\nThis plugin allows the application to detect if an inputed image target is visible, or not, by matching the image features with the device camera features using [OpenCV](http://opencv.org/) (v3.1. on Android, v2.4.13 on iOS)  It also presents the device camera preview in the background.\n\n## Changes\n- Added setting multiple patterns and loop functionality to detect which is visible\n\n### Note\nThe plugin is aimed to work in **portrait mode**, should also work in landscape but no guarantees.\n\n## Install\nTo install the plugin in your current Cordova project run outside you project root\n```\ngit clone https://github.com/Cloudoki/ImageDetectionCordovaPlugin.git\ncd <your-project-root>\ncordova plugin add ../ImageDetectionCordovaPlugin\n```\n\n### Android\n- The plugin aims to be used with Android API >= 16 (4.1 Jelly Bean).\n\n### IOS\n- The plugin aims to be used with iOS version >= 7.\n- **Important!** Go into src/ios folder and extract opencv2.framework from the zip file into the same folder.\n- Since iOS 10, `<key>NSCameraUsageDescription</key>` is required in the project Info.plist of any app that wants to use Camera.\nThe plugin should add this automatically but in case this does not happen to add it, just open the project in XCode, go to the Info tab and add the `NSCameraUsageDescription` key with a string value that explain why your app need an access to the camera.\n\n### Note\nIn *config.xml* add Android and iOS target preference\n```javascript\n<platform name=\"android\">\n    <preference name=\"android-minSdkVersion\" value=\"16\" />\n</platform>\n<platform name=\"ios\">\n    <preference name=\"target-device\" value=\"handset\"/>\n    <preference name=\"deployment-target\" value=\"7.0\"/>\n</platform>\n```\nAnd don't forget to set the background to be transparent or the preview may not shown up.\nAgain in *config.xml* add the following preference.\n```javascript\n<preference name=\"backgroundColor\" value=\"0x00000000\" />\n```\n\n## Usage\nThe plugin offers the functions `startProcessing`, `setDetectionTimeout`, `isDetecting` and `setPattern`.\n\n**`startProcessing`** - the plugin will process the video frames captured by the camera if the inputed argument is `true`, if the argument is `false` no frames will be processed. Calls on success if the argument is set and on error if no value set.\n\n**Note:** the plugins start with this option true.\n```javascript\nstartProcessing(true or false, successCallback, errorCallback);\n```\n\n**`isDetecting`** - the plugin will callback on success function if detecting the pattern or on error function if it's not. The response will also say what index of the patterns is being detected, the detection rect coordinates and the center/centroid in a JSON object. Just parse it using `JSON.parse()`.\n```javascript\nisDetecting(successCallback, errorCallback);\n```\n```json\n// JSON RESPONSE EXAMPLE\n{\n  \"message\": \"pattern detected\", \n  \"index\": 0,\n  \"coords\": {\n    \"1\": { \"x\": 170.839401, \"y\": 181.510239 }, \n    \"2\": { \"x\": 293.745239, \"y\": 180.525345 }, \n    \"3\": { \"x\": 301.409363, \"y\": 352.518280 }, \n    \"4\": { \"x\": 171.494492, \"y\": 360.808655 }\n  }, \n  \"center\": {\n    \"x\": 234.956223, \"y\": 268.231842\n  }\n}\n```\n\n**`setDetectionTimeout`** - this function will set a timeout (**in seconds**) in which the processing of the frames will not occur. Calls on success if the argument is set and on error if no value set.\n```javascript\nsetDetectionTimeout(timeout, successCallback, errorCallback);\n```\n\n**`setPatterns`** - sets the patterns targets to be detected. Calls on success if the patterns are set and on error if one or more patterns fail to be set. The input patterns must be an array of base64 image string.\n```javascript\nsetPatterns([base64image, ...], successCallback, errorCallback);\n```\n\n## Usage example\n```javascript\nvar imgDetectionPlugin = window.plugins.ImageDetectionPlugin || new ImageDetectionPlugin();\n\nimgDetectionPlugin.startProcessing(true, function(success){console.log(success);}, function(error){console.log(error);});\n\nimgDetectionPlugin.isDetecting(function(success){\n  console.log(success);\n  var resp = JSON.parse(success);\n  console.log(resp.index, \"image detected - \", indexes[resp.index], resp.coords, resp.center);\n}, function(error){console.log(error);});\n\nfunction setAllPatterns(patterns) {\n  imgDetectionPlugin.setPatterns(patterns, function(success){console.log(success);}, function(error){console.log(error);});\n}\n\nvar loadAllImg = 0;\nvar patternsHolder = [];\nvar indexes = {};\nvar limit = 3;\n\nfunction ToDataURL (self) {\n  var canvas = document.createElement('canvas');\n  var ctx = canvas.getContext('2d');\n  var dataURL;\n  canvas.height = self.height;\n  canvas.width = self.width;\n  ctx.drawImage(self, 0, 0);\n  dataURL = canvas.toDataURL(\"image/jpeg\", 0.8);\n  patternsHolder.push(dataURL);\n  indexes[loadAllImg] = self.src.substr(self.src.lastIndexOf(\"/\") + 1);\n  loadAllImg += 1;\n  console.log(\"!!!\", loadAllImg, indexes);\n  if(loadAllImg == limit){\n    console.log(\"patterns set\", patternsHolder);\n    setAllPatterns(patternsHolder);\n  }\n  canvas = null;\n}\n\nvar img = new Image();\nimg.crossOrigin = \"Anonymous\";\nimg.onload = function(){\n  ToDataURL(this)\n};\nimg.src = \"img/patterns/target1.jpg\";\n\nvar img = new Image();\nimg.crossOrigin = \"Anonymous\";\nimg.onload = function(){\n  ToDataURL(this)\n};\nimg.src = \"img/patterns/target2.jpg\";\n\nvar img = new Image();\nimg.crossOrigin = \"Anonymous\";\nimg.onload = function(){\n  ToDataURL(this)\n};\nimg.src = \"img/patterns/target3.jpg\";\n\nimgDetectionPlugin.setDetectionTimeout(2, function(success){console.log(success);}, function(error){console.log(error);});\n```\n\n## Demo Project\n[ImageDetectionDemoApp](https://github.com/a31859/ImageDetectionDemoApp)\n",
+  "readmeFilename": "README.md",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Cloudoki/ImageDetectionCordovaPlugin.git"
+  },
+  "version": "0.0.2"
+}

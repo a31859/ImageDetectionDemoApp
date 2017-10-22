@@ -4,7 +4,7 @@
 var ImageDetectionPlugin = function () {};
 
 ImageDetectionPlugin.prototype.startProcessing = function (bool, successCallback, errorCallback) {
-  cordova.exec(successCallback, errorCallback, "ImageDetectionPlugin", "startProcessing", [bool]);
+  cordova.exec(successCallback, errorCallback, "ImageDetectionPlugin", "startProcessing", [bool, window.innerHeight, window.innerWidth]);
 };
 ImageDetectionPlugin.prototype.setPatterns = function (patterns, successCallback, errorCallback) {
  var _patterns = [];

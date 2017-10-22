@@ -1,0 +1,10 @@
+{
+  "com.cloudoki.imagedetectionplugin": {
+    "source": {
+      "type": "local",
+      "path": "../ImageDetectionCordovaPlugin"
+    },
+    "is_top_level": true,
+    "variables": {}
+  }
+}
