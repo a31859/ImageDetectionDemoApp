@@ -1,6 +1,6 @@
 # Image Detection Cordova Plugin Demo
 
-[![Maintenance](https://img.shields.io/maintenance/no/2017.svg?style=for-the-badge)](https://github.com/a31859/ImageDetectionDemoApp#image-detection-cordova-plugin-demo)
+[![No Maintenance Intended](http://unmaintained.tech/badge.svg)](http://unmaintained.tech/)
 
 This demo was done to show an example on the usage of the [ImageDetectionCordovaPlugin](https://github.com/Cloudoki/ImageDetectionCordovaPlugin). The code shown can serve has a guide but this project won't receive any updates in the future.
 
